@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculador de Bastidores</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: #d2b48c;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: #f5e9d2;
+            padding: 20px;
+            width: 100%;
+            max-width: 420px; 
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            background-image: url("https://www.transparenttextures.com/patterns/paper.png");
+            box-sizing: border-box;
+        }
+
+        /* Títulos */
+        h2 {
+            text-align: center;
+            color: #3b2a18;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+        
+        /* Contenedor de Detalle del Pedido */
+        .detalle-cotizacion {
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        
+        .detalle-cotizacion h3 {
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 5px;
+            font-size: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        #lista-bastidores {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            font-size: 14px;
+            color: #3b2a18;
+        }
+        
+        #lista-bastidores li {
+            padding: 8px 0;
+            border-bottom: 1px dotted #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Botón pequeño para borrar (X) */
+        .btn-borrar {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Inputs y Selects */
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            font-size: 18px;
+            border-radius: 6px;
+            /* Borde inicial */
+            border: 1px solid #765c3b;
+            margin-top: 5px;
+            background: #fffaf0;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease; /* Transición para que se vea suave */
+        }
+        
+        /* ESTILO APLICADO POR JS CUANDO EL CAMPO ESTÁ VACÍO */
+        .input-error {
+            border: 2px solid #dc3545 !important; /* Borde rojo */
+        }
+
+        /* Botones Principales */
+        button.principal {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        
+        #btn-agregar {
+            background: #28a745;
+            color: white;
+            margin-top: 15px;
+        }
+
+        #btn-agregar:hover {
+            background: #218838;
+        }
+
+        /* Contenedor de Resultado */
+        #resultado-contenedor {
+            margin-top: 15px;
+            padding: 15px;
+            background: #e9ecef;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        #costo-acumulado {
+            font-size: 32px;
+            font-weight: bold;
+            color: #dc3545;
+            margin: 5px 0 0 0;
+        }
+        
+        #titulo-acumulado {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #3b2a18;
+        }
+
+        /* Botón WhatsApp */
+        #whatsapp-link {
+            text-decoration: none;
+            display: block;
+            margin-top: 10px; 
+        }
+
+        #whatsapp-link button {
+            background: #25D366;
+            color: white;
+        }
+        
+        #whatsapp-link button:hover {
+            background: #128c7e;
+        }
+        
+        /* Nota Informativa */
+        #nota {
+            margin-top: 15px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            background: black;
+            border-radius: 8px;
+            line-height: 1.3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Calculador de Bastidores</h2>
+
+    <label for="ancho">Ancho (cm)</label>
+    <input type="number" id="ancho" placeholder="" oninput="validarCampo('ancho')" />
+
+    <label for="alto">Alto (cm)</label>
+    <input type="number" id="alto" placeholder="" oninput="validarCampo('alto')" />
+
+    <label for="tipo">Tipo de bastidor</label>
+    <select id="tipo">
+        <option value="lienzo">Lienzo (tela)</option>
+        <option value="mdf">MDF</option>
+    </select>
+
+    <label for="cantidad">Cantidad</label>
+    <select id="cantidad">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    
+    <div class="detalle-cotizacion">
+        <h3>Detalle del Pedido:</h3>
+        <ul id="lista-bastidores">
+            <li>Aún no se han agregado bastidores.</li>
+        </ul>
+    </div>
+    
+    <button id="btn-agregar" class="principal" onclick="agregarBastidor()">Agregar al Pedido</button>
+    
+    <div id="resultado-contenedor">
+        <h3 id="titulo-acumulado">Costo Total:</h3>
+        <p id="costo-acumulado">$0</p>
+    </div>
+
+    <div id="nota">
+        Los materiales se compran únicamente con previo depósito o pago por parte del solicitante.
+    </div>
+
+    <a id="whatsapp-link" href="#" onclick="enviarPorWhatsApp(); return false;">
+        <button class="principal">Enviar pedido por WhatsApp</button>
+    </a>
+</div>
+
+<script>
+    // ARRAY GLOBAL PARA ALMACENAR TODOS LOS PEDIDOS
+    let pedidos = [];
+    
+    // Función para validar visualmente los campos
+    function validarCampo(id) {
+        const input = document.getElementById(id);
+        // Si el valor es nulo (vacío) o cero, añade la clase de error. Si tiene valor > 0, la quita.
+        if (!input.value || parseFloat(input.value) <= 0) {
+            input.classList.add('input-error');
+        } else {
+            input.classList.remove('input-error');
+        }
+    }
+
+    // Al cargar la página, aseguramos que los campos requeridos tengan la marca visual de error
+    window.onload = function() {
+        validarCampo('ancho');
+        validarCampo('alto');
+        actualizarVistaPedidos();
+    };
+
+    // 1. LÓGICA DE PRECIOS (INTACTA)
+    function calcularPrecioUnitario(ancho, alto, tipo) {
+        const precioAlfajia_cm = 140 / 240;
+        const precioLienzo_cm2 = 0.019;
+        const costoFijo = 60;
+        const solape = 30;
+        const gananciaLienzo = 1.43;
+        const factorMdfSobreLienzo = 1.40;
+
+        let maderas = 2 * (ancho + alto);
+        if (ancho > 50 && alto > 50) {
+            maderas += Math.min(ancho, alto);
+        }
+
+        const costoMadera = maderas * precioAlfajia_cm;
+        const costoImprimacion = (ancho * alto) * precioLienzo_cm2;
+        const costoBase = costoMadera + costoImprimacion + costoFijo;
+
+        const areaTelaLienzo = (ancho + solape) * (alto + solape);
+        const costoTelaLienzo = areaTelaLienzo * precioLienzo_cm2;
+        const costoSiFueraLienzo = costoBase + costoTelaLienzo;
+        const precioUnitarioLienzo = Math.round(costoSiFueraLienzo * gananciaLienzo);
+
+        let precioUnitario = tipo === "lienzo"
+            ? precioUnitarioLienzo
+            : Math.round(precioUnitarioLienzo * factorMdfSobreLienzo);
+            
+        return precioUnitario;
+    }
+
+    // 2. AGREGAR A LA LISTA
+    function agregarBastidor() {
+        const ancho = parseFloat(document.getElementById("ancho").value);
+        const alto = parseFloat(document.getElementById("alto").value);
+        const tipo = document.getElementById("tipo").value;
+        const cantidad = parseInt(document.getElementById("cantidad").value, 10);
+
+        // Si la validación falla (sigue vacío), no agrega y alerta
+        if (!ancho || !alto || ancho <= 0 || alto <= 0) {
+             alert("Por favor, ingrese medidas válidas en los campos con borde rojo.");
+             validarCampo('ancho');
+             validarCampo('alto');
+             return;
+        }
+        
+        // Quita el borde rojo si se agregaron correctamente
+        document.getElementById('ancho').classList.remove('input-error');
+        document.getElementById('alto').classList.remove('input-error');
+
+        const precioUnitario = calcularPrecioUnitario(ancho, alto, tipo);
+        const costoTotalItem = precioUnitario * cantidad;
+        
+        const nuevoItem = {
+            ancho: ancho,
+            alto: alto,
+            tipo: tipo,
+            cantidad: cantidad,
+            costo: costoTotalItem
+        };
+
+        pedidos.push(nuevoItem);
+        actualizarVistaPedidos();
+        
+        // Limpiar campos y validar de nuevo para que el borde rojo reaparezca
+        document.getElementById('ancho').value = '';
+        document.getElementById('alto').value = '';
+        document.getElementById('cantidad').value = '1';
+        validarCampo('ancho');
+        validarCampo('alto');
+    }
+
+    // 3. FUNCIÓN: ELIMINAR BASTIDOR
+    function eliminarBastidor(index) {
+        pedidos.splice(index, 1);
+        actualizarVistaPedidos();
+    }
+
+    // 4. ACTUALIZAR VISTA
+    function actualizarVistaPedidos() {
+        const listaUI = document.getElementById('lista-bastidores');
+        const costoAcumuladoUI = document.getElementById('costo-acumulado');
+        listaUI.innerHTML = ''; 
+
+        let total_acumulado = 0;
+
+        if (pedidos.length === 0) {
+            listaUI.innerHTML = '<li>Aún no se han agregado bastidores.</li>';
+            costoAcumuladoUI.innerText = "$0";
+            return;
+        }
+
+        pedidos.forEach((item, index) => {
+            const li = document.createElement('li');
+            
+            const texto = `${item.ancho}x${item.alto}cm x ${item.cantidad} u. (${item.tipo.toUpperCase()}) - $${Math.round(item.costo)}`;
+            
+            li.innerHTML = `
+                <span>${texto}</span>
+                <button class="btn-borrar" onclick="eliminarBastidor(${index})">X</button>
+            `;
+            
+            listaUI.appendChild(li);
+            total_acumulado += item.costo;
+        });
+
+        costoAcumuladoUI.innerText = `$${Math.round(total_acumulado)}`;
+    }
+
+    // 5. WHATSAPP
+    function enviarPorWhatsApp() {
+        if (pedidos.length === 0) {
+            alert("Agregue bastidores al pedido antes de enviar.");
+            return;
+        }
+        
+        let mensaje = "¡Hola! Quisiera hacer un pedido de bastidores:\n\n";
+        let total = 0;
+        
+        pedidos.forEach((item) => {
+            mensaje += `${item.ancho}x${item.alto}cm (x${item.cantidad} u. ${item.tipo.toUpperCase()}) - $${Math.round(item.costo)}\n`;
+            total += item.costo;
+        });
+
+        mensaje += "\n-----------------------------------\n";
+        mensaje += `*COSTO TOTAL:* $${Math.round(total)}`; 
+        mensaje += "\n-----------------------------------\n";
+
+        const mensajeCodificado = encodeURIComponent(mensaje);
+        const whatsappURL = "https://wa.me/59899476235?text=" + mensajeCodificado; 
+        
+        window.open(whatsappURL, '_blank');
+        
+        if (confirm("Se ha abierto la ventana de WhatsApp. ¿Desea limpiar el pedido actual?")) {
+            pedidos = [];
+            actualizarVistaPedidos();
+            // Asegura que se vuelva a mostrar el error visual después de limpiar
+            validarCampo('ancho');
+            validarCampo('alto');
+        }
+    }
+    
+</script>
+</body>
+</html>
